@@ -2,8 +2,7 @@ package com.tiam.peripheral.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.tiam.peripheral.entity.User;
-
-import java.util.Map;
+import com.tiam.peripheral.vo.LoginToken;
 
 /**
  * @author Tiam
@@ -11,5 +10,6 @@ import java.util.Map;
  * @description
  */
 public interface UserService extends IService<User> {
-    Map<String, Object> login(User user);
+    LoginToken login(User user);
+
 }

@@ -22,6 +22,11 @@ logging:
 mybatis-plus:
   type-aliases-package: com.tiam.peripheral.entity
   mapper-locations: classpath:mapper/*.xml
+  # sql 打印
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+    cache-enabled: false
 
 
 

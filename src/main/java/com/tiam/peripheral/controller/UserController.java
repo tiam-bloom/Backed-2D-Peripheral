@@ -1,15 +1,22 @@
 package com.tiam.peripheral.controller;
 
-import com.tiam.peripheral.entity.R;
+import com.tiam.peripheral.vo.R;
 import com.tiam.peripheral.entity.User;
 import com.tiam.peripheral.service.UserService;
+import com.tiam.peripheral.utils.RedisUtil;
+import com.tiam.peripheral.utils.TokenUtil;
+import com.tiam.peripheral.vo.LoginToken;
+import com.tiam.peripheral.vo.Token;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
@@ -24,7 +31,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/login")
-    public R<?> login(@RequestBody @Validated User user) {
+    public R<?> login(@RequestBody @Validated User user, HttpSession session) {
         log.info(user);
 
         User one = userService.query().eq("username", user.getUsername()).one();
@@ -32,7 +39,8 @@ public class UserController {
             return R.error("用户不存在");
         if (!one.getPassword().equals(user.getPassword()))
             return R.error("密码错误");
-        Map<String, Object> loginResult = userService.login(user);
+        LoginToken loginResult = userService.login(user);
+        session.setAttribute("username", user.getUsername());
         return R.ok("登录成功", loginResult);
     }
 
@@ -47,16 +55,27 @@ public class UserController {
     }
 
     @PostMapping("/refreshToken")
-    public R<?> refreshToken(@RequestBody Map<String, String> map) {
+    public R<?> refreshToken(@RequestBody Map<String, String> map, HttpSession session) {
         // { refreshToken: data.refreshToken }
+        String refreshToken = map.get("refreshToken");
+        if (refreshToken == null) {
+            return R.error("refreshToken不能为空");
+        }
+        // 从session中获取用户名
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            return R.error("用户未登录");
+        }
+        String name = RedisUtil.get(refreshToken);
+        if (!StringUtils.equals(name, username)) {
+            return R.error("refreshToken不正确");
+        }
+        Token token = TokenUtil.genToken(username);
+        return R.ok("刷新成功", token);
+    }
 
-        // return
-//        {
-//            accessToken: "eyJhbGciOiJIUzUxMiJ9.newAdmin",
-//                    refreshToken: "eyJhbGciOiJIUzUxMiJ9.newAdminRefresh",
-//                // `expires`选择这种日期格式是为了方便调试，后端直接设置时间戳或许更方便（每次都应该递增）。如果后端返回的是时间戳格式，前端开发请来到这个目录`src/utils/auth.ts`，把第`38`行的代码换成expires = data.expires即可。
-//                expires: "2023/10/30 23:59:59"
-//        }
-        return R.ok("刷新成功");
+    @GetMapping("/unLogin")
+    public R<?> unLogin() {
+        return R.error("用户未登录, 请先登录!");
     }
 }

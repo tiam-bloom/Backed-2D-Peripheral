@@ -52,6 +52,11 @@
             <artifactId>fastjson</artifactId>
             <version>2.0.41</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.13.0</version>
+        </dependency>
         <!-- https://doc.hutool.cn/pages/JWTUtil/#%E4%BB%8B%E7%BB%8D -->
         <dependency>
             <groupId>cn.hutool</groupId>

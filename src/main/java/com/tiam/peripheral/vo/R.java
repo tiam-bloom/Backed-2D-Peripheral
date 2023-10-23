@@ -1,4 +1,4 @@
-package com.tiam.peripheral.entity;
+package com.tiam.peripheral.vo;
 
 import lombok.Data;
 
