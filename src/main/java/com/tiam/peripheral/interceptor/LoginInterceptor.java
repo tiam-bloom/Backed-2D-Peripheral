@@ -31,7 +31,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 记录日志
-        log.info("请求路径：{}", request.getRequestURI());
+        log.debug("请求路径：{}", request.getRequestURI());
         // 校验是否登录
         HttpSession session = request.getSession();
         String username = (String) session.getAttribute("username");

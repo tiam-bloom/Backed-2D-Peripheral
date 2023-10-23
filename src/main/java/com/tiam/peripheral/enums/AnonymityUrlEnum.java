@@ -2,7 +2,6 @@ package com.tiam.peripheral.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @author Tiam
@@ -11,7 +10,7 @@ import lombok.Setter;
  */
 @AllArgsConstructor
 @Getter
-public enum AnonymityUrl {
+public enum AnonymityUrlEnum {
     /**
      * 无需登录即可访问的url
      */
@@ -24,7 +23,7 @@ public enum AnonymityUrl {
 
     public static boolean isAnonymityUrl(String url) {
         // 遍历
-        for (AnonymityUrl value : AnonymityUrl.values()) {
+        for (AnonymityUrlEnum value : AnonymityUrlEnum.values()) {
             if (value.url.equals(url)) {
                 return true;
             }

@@ -1,6 +1,6 @@
 package com.tiam.peripheral.config;
 
-import com.tiam.peripheral.enums.AnonymityUrl;
+import com.tiam.peripheral.enums.AnonymityUrlEnum;
 import com.tiam.peripheral.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +33,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
      * @return 匿名访问路径列表
      */
     private List<String> anonymityUrlList() {
-        return Arrays.stream(AnonymityUrl.values()).map(AnonymityUrl::getUrl).collect(Collectors.toList());
+        return Arrays.stream(AnonymityUrlEnum.values()).map(AnonymityUrlEnum::getUrl).collect(Collectors.toList());
     }
 }

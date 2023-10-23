@@ -1,5 +1,7 @@
 package com.tiam.peripheral.vo;
 
+import com.tiam.peripheral.enums.ExceptionEnum;
+import com.tiam.peripheral.exception.BizException;
 import lombok.Data;
 
 /**
@@ -8,7 +10,7 @@ import lombok.Data;
  * @description
  */
 @Data
-public class R <T>{
+public class R<T> {
     private int code;
     private String msg;
     private T data;
@@ -55,4 +57,18 @@ public class R <T>{
     public static <T> R<T> error(String msg) {
         return new R<T>(500, msg);
     }
+
+    public static <T> R<T> error(int code, String msg) {
+        return new R<T>(code, msg);
+    }
+
+    public static <T> R<T> error(ExceptionEnum exceptionEnum) {
+        return R.error(exceptionEnum.getCode(), exceptionEnum.getMessage());
+    }
+
+    public static <T> R<T> error(BizException bizException) {
+        return R.error(bizException.getCode(), bizException.getMessage());
+    }
+
+
 }
