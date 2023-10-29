@@ -1,7 +1,9 @@
 package com.tiam.peripheral.controller;
 
+import com.tiam.peripheral.entity.Role;
 import com.tiam.peripheral.enums.ExceptionEnum;
 import com.tiam.peripheral.exception.BizException;
+import com.tiam.peripheral.service.RoleService;
 import com.tiam.peripheral.vo.R;
 import com.tiam.peripheral.entity.User;
 import com.tiam.peripheral.service.UserService;
@@ -16,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +31,8 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private RoleService roleService;
 
     @PostMapping("/login")
     public R<?> login(@RequestBody @Validated User user, HttpSession session) {
@@ -57,7 +62,7 @@ public class UserController {
     }
 
     @PostMapping("/refreshToken")
-    public R<?> refreshToken(@RequestBody Map<String, String> map, HttpSession session) {
+    public R<Token> refreshToken(@RequestBody Map<String, String> map, HttpSession session) {
         // { refreshToken: data.refreshToken }
         String refreshToken = map.get("refreshToken");
         if (refreshToken == null) {
@@ -72,9 +77,24 @@ public class UserController {
         if (!StringUtils.equals(name, username)) {
             throw new BizException("refreshToken错误");
         }
-        Token token = TokenUtil.genToken(username);
+        Role role = roleService.lambdaQuery().eq(Role::getRoleName, username).one();
+        Token token = TokenUtil.genToken(username, role.getRoleName());
         return R.ok("刷新成功", token);
     }
+
+    @GetMapping("/logout")
+    public R<?> logout(HttpSession session) {
+        session.removeAttribute("username");
+        return R.ok("登出成功");
+    }
+
+    @GetMapping("/user/list")
+    public R<?> list() {
+        List<User> list = userService.list();
+        return R.ok(list);
+    }
+
+
 
 
 }

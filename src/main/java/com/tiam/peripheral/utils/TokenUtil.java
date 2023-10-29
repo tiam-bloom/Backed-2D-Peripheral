@@ -30,7 +30,6 @@ public class TokenUtil {
      * 私钥 / 生成签名的时候使用的秘钥secret，一般可以从本地配置文件中读取，切记这个秘钥不能外露，只在服务端使用，在任何场景都不应该流露出去。
      * 一旦客户端得知这个secret, 那就意味着客户端是可以自我签发jwt了。
      * 应该大于等于 256位(长度32及以上的字符串)，并且是随机的字符串
-     *
      */
     private final static String SECRET = "qwertyuidasdfghjklzxcvbnm12234567890";
     /**
@@ -47,11 +46,11 @@ public class TokenUtil {
     private final static String SUBJECT = "Peripherals";
 
 
-    public static Token genToken(String username) {
+    public static Token genToken(String username, String role) {
         String refreshToken = UUID.randomUUID().toString();
         RedisUtil.set(refreshToken, username, REFRESH_EXPIRE);
         return Token.builder()
-                .accessToken(genAccessToken(username))
+                .accessToken(genAccessToken(username, role))
                 .refreshToken(refreshToken)
                 .expire(new Timestamp(Instant.now().plusSeconds(ACCESS_EXPIRE).toEpochMilli()))
                 .build();
@@ -67,7 +66,7 @@ public class TokenUtil {
     iat: jwt的签发时间
     jti: jwt的唯一身份标识，主要用来作为一次性token,从而回避重放攻击
      */
-    public static String genAccessToken(String username) {
+    public static String genAccessToken(String username, String role) {
         // 令牌id
         String uuid = UUID.randomUUID().toString();
         Date exprireDate = Date.from(Instant.now().plusSeconds(ACCESS_EXPIRE));
@@ -80,6 +79,7 @@ public class TokenUtil {
                 .and()
                 // 设置自定义负载信息payload
                 .claim("username", username)
+                .claim("role", role)
                 // 令牌ID
                 .id(uuid)
                 // 过期日期

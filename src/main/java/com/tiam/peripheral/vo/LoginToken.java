@@ -16,7 +16,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class LoginToken extends Token {
     private String username;
-    private List<String> roles;
+    private String role;
 
     public LoginToken(Token token){
         super(token.getAccessToken(), token.getRefreshToken(), token.getExpire());
