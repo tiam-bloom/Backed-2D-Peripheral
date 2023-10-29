@@ -70,5 +70,20 @@ public class R<T> {
         return R.error(bizException.getCode(), bizException.getMessage());
     }
 
+    public static <T> R<T> is(boolean flag) {
+        return flag ? R.ok() : R.error();
+    }
+
+    public static <T> R<T> is(boolean flag, String ok, String error) {
+        return flag ? R.ok(ok) : R.error(error);
+    }
+
+    public static <T> R<T> isOK(boolean flag, String msg) {
+        return R.is(flag, msg, null);
+    }
+
+    public static <T> R<T> isErr(boolean flag, String msg) {
+        return R.is(flag, null, msg);
+    }
 
 }

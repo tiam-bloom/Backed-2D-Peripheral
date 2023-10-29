@@ -31,13 +31,13 @@ public class UserController {
 
     @PostMapping("/login")
     public R<?> login(@RequestBody @Validated User user, HttpSession session) {
-        log.info(user);
+        log.info("login: {}", user);
 
         User one = userService.query().eq("username", user.getUsername()).one();
         if (one == null) {
             throw new BizException("用户不存在");
         }
-        if (!one.getPassword().equals(user.getPassword())) {
+        if (!StringUtils.equals(one.getPassword(), user.getPassword())) {
             throw new BizException("密码错误");
         }
         LoginToken loginToken = userService.login(user);
@@ -47,13 +47,13 @@ public class UserController {
 
     @PostMapping("/register")
     public R<?> register(@RequestBody @Validated User user) {
-        log.info(user);
+        log.info("register: {}", user);
         User one = userService.query().eq("username", user.getUsername()).one();
         if (one != null) {
             throw new BizException("用户已注册");
         }
-        userService.save(user);
-        return R.ok("注册成功");
+        boolean save = userService.save(user);
+        return R.isOK(save, "注册成功");
     }
 
     @PostMapping("/refreshToken")
@@ -63,7 +63,7 @@ public class UserController {
         if (refreshToken == null) {
             throw new BizException("refreshToken不能为空");
         }
-        // 从session中获取用户名
+        // fixme: 从session中获取用户名
         String username = (String) session.getAttribute("username");
         if (username == null) {
             throw new BizException(ExceptionEnum.NOT_LOGIN);
