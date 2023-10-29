@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * @author Tiam
  * @date 2023/10/23 19:24
- * @description
+ * @description 全局异常处理
  */
 @RestControllerAdvice
 @Log4j2

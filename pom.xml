@@ -64,14 +64,14 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.13.0</version>
         </dependency>
-        <!-- https://doc.hutool.cn/pages/JWTUtil/#%E4%BB%8B%E7%BB%8D -->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-jwt</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.12.3</version>
         </dependency>
     </dependencies>
     <dependencyManagement>
