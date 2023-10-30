@@ -41,4 +41,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .setUsername(username)
                 .setRole(role.getRoleName());
     }
+
+    @Override
+    public User findUserByName(String name) {
+        return userMapper.selectOne(new QueryWrapper<User>().lambda().eq(User::getUsername, name));
+    }
 }

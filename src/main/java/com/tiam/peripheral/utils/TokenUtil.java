@@ -103,7 +103,8 @@ public class TokenUtil {
     }
 
     /**
-     * 解析token
+     * 解析token,
+     * 使用不一致签名的私钥解析token会抛出异常
      *
      * @param token token
      * @return Jws<Claims>

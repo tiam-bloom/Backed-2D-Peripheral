@@ -12,4 +12,5 @@ import com.tiam.peripheral.vo.LoginToken;
 public interface UserService extends IService<User> {
     LoginToken login(User user);
 
+    User findUserByName(String name);
 }

@@ -1,19 +1,22 @@
 package com.tiam.peripheral.interceptor;
 
+import com.tiam.peripheral.entity.Role;
+import com.tiam.peripheral.entity.User;
 import com.tiam.peripheral.exception.BizException;
+import com.tiam.peripheral.mapper.RoleMapper;
+import com.tiam.peripheral.mapper.UserMapper;
 import com.tiam.peripheral.utils.TokenUtil;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.SignatureException;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Tiam
@@ -25,6 +28,12 @@ import java.util.Objects;
 @Component
 @Log4j2
 public class LoginInterceptor implements HandlerInterceptor {
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
+
     /**
      * 登录后(session) 且有 accessToken 的请求才能通过
      *
@@ -40,6 +49,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         log.debug("请求路径：{}", request.getRequestURI());
         // 校验accessToken, 合法accessToken == 已登录
         String accessToken = request.getHeader("Authorization");
+        // todo 调整异常抛出消息
         if (Objects.isNull(accessToken)) {
             throw new BizException("accessToken不能为空");
         }
@@ -50,14 +60,29 @@ public class LoginInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             throw new BizException("accessToken不合法, " + e.getMessage());
         }
-        String name = claims.get("username", String.class);
-        String role = claims.get("role", String.class);
-        // todo 用户是否存在
+        // 用户是否存在
+        if(!isExistsUser(claims)){
+            throw new BizException("用户不存在");
+        }
+        // todo 验证角色权限?
+
         // 签发日期不同, 始终为false
 //        if (!TokenUtil.verifyToken(accessToken).test(name, role)) {
 //            throw new BizException("accessToken不正确");
 //        }
         // 放行
         return true;
+    }
+
+    private boolean isExistsUser(Claims claims){
+        String username = claims.get("username", String.class);
+        String roleName = claims.get("role", String.class);
+        // 用户是否存在
+        User user = userMapper.findUserByUsername(username);
+        if(Objects.isNull(user)){
+            return false;
+        }
+        Role role = roleMapper.selectById(user.getRoleId());
+        return Objects.nonNull(role) && StringUtils.equals(roleName, role.getRoleName());
     }
 }
