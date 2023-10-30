@@ -33,7 +33,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public LoginToken login(User user) {
         String username = user.getUsername();
         // 获取用户角色
-        Role role = roleMapper.selectOne(new QueryWrapper<Role>().lambda().eq(Role::getId, user.getRoleId()));
+        Role role = roleMapper.selectById(user.getRoleId());
 
         Token token = TokenUtil.genToken(username, role.getRoleName());
 

@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,6 +45,10 @@ public class UserController {
         }
         if (!StringUtils.equals(one.getPassword(), user.getPassword())) {
             throw new BizException("密码错误");
+        }
+        // 角色是否匹配
+        if (!Objects.equals(one.getRoleId(), user.getRoleId())) {
+            throw new BizException("角色不匹配");
         }
         LoginToken loginToken = userService.login(user);
         return R.ok("登录成功", loginToken);

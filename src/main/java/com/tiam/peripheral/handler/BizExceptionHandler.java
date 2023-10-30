@@ -5,8 +5,11 @@ import com.tiam.peripheral.vo.R;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Objects;
 
 /**
  * @author Tiam
@@ -37,5 +40,16 @@ public class BizExceptionHandler {
             return R.error("token过期, 请重新登录!");
         }
         return R.error("token异常, 请重新登录!");
+    }
+
+    /**
+     * 参数校验异常捕获
+     * @param e MethodArgumentNotValidException
+     * @return R<?>
+     */
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public R<?> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
+        log.debug("参数校验异常捕获,错误原因>>>" + e.getMessage());
+        return R.error(Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage());
     }
 }

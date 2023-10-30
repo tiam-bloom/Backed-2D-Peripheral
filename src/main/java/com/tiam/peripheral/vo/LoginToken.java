@@ -4,8 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.util.List;
-
 /**
  * @author Tiam
  * @date 2023/10/23 16:43
