@@ -81,5 +81,15 @@ public class TokenTest {
 
     }
 
+    @Test
+    public void test4() throws InterruptedException {
+        String accessToken = TokenUtil.genAccessToken("admin", "admin");
+        System.out.println(accessToken);
+        Thread.sleep(3000);
+        // 测试是否能解析过期的token => 过期抛出 ExpiredJwtException异常
+        Jws<Claims> claimsJws = TokenUtil.parseClaim(accessToken);
+        Claims payload = claimsJws.getPayload();
+        System.out.println(payload);
 
+    }
 }

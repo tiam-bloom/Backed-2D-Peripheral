@@ -2,6 +2,7 @@ package com.tiam.peripheral.interceptor;
 
 import com.tiam.peripheral.entity.Role;
 import com.tiam.peripheral.entity.User;
+import com.tiam.peripheral.enums.ExceptionEnum;
 import com.tiam.peripheral.exception.BizException;
 import com.tiam.peripheral.mapper.RoleMapper;
 import com.tiam.peripheral.mapper.UserMapper;
@@ -16,7 +17,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Tiam
@@ -35,7 +35,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     private RoleMapper roleMapper;
 
     /**
-     * 登录后(session) 且有 accessToken 的请求才能通过
+     * 具有合法 accessToken 的请求才能通过
      *
      * @param request  current HTTP request
      * @param response current HTTP response
@@ -49,27 +49,16 @@ public class LoginInterceptor implements HandlerInterceptor {
         log.debug("请求路径：{}", request.getRequestURI());
         // 校验accessToken, 合法accessToken == 已登录
         String accessToken = request.getHeader("Authorization");
-        // todo 调整异常抛出消息
         if (Objects.isNull(accessToken)) {
-            throw new BizException("accessToken不能为空");
+            throw new BizException(ExceptionEnum.NOT_LOGIN);
         }
-        // 解析accessToken, fixme 解析失败处理, 过期处理
-        Claims claims = null;
-        try {
-            claims = TokenUtil.parsePayload(accessToken);
-        } catch (Exception e) {
-            throw new BizException("accessToken不合法, " + e.getMessage());
-        }
+        // 解析accessToken => JwtException 异常处理
+        Claims claims = TokenUtil.parsePayload(accessToken);
         // 用户是否存在
         if(!isExistsUser(claims)){
             throw new BizException("用户不存在");
         }
-        // todo 验证角色权限?
-
-        // 签发日期不同, 始终为false
-//        if (!TokenUtil.verifyToken(accessToken).test(name, role)) {
-//            throw new BizException("accessToken不正确");
-//        }
+        // todo 验证角色权限
         // 放行
         return true;
     }

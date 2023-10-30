@@ -5,8 +5,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SecureDigestAlgorithm;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
@@ -16,7 +14,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 /**
  * @author Tiam
@@ -26,23 +23,22 @@ import java.util.function.Predicate;
 public class TokenUtil {
     /**
      * 过期时间
+     * 7小时
+     * 7天
      */
-    public static final int ACCESS_EXPIRE = 60;
+    public static final int ACCESS_EXPIRE = 60 * 60 * 7;
     public static final int REFRESH_EXPIRE = 60 * 60 * 24 * 7;
-    /**
-     * 加密算法
-     */
-    private final static SecureDigestAlgorithm<SecretKey, SecretKey> ALGORITHM = Jwts.SIG.HS256;
+
     /**
      * 私钥 / 生成签名的时候使用的秘钥secret，一般可以从本地配置文件中读取，切记这个秘钥不能外露，只在服务端使用，在任何场景都不应该流露出去。
-     * 一旦客户端得知这个secret, 那就意味着客户端是可以自我签发jwt了。
+     * 一旦客户端得知这个com.asiainfo.adapter.party.service.impl.CmxGroupAccountClientSVImpl, 那就意味着客户端是可以自我签发jwt了。
      * 应该大于等于 256位(长度32及以上的字符串)，并且是随机的字符串
      */
     private final static String SECRET = "qwertyuidasdfghjklzxcvbnm122345678901";
     /**
      * 秘钥实例
      */
-    public static final SecretKey KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
+    public static final SecretKey KEY = Jwts.SIG.HS256.key().build();
     /**
      * jwt签发者
      */
@@ -98,13 +94,15 @@ public class TokenUtil {
                 // 签发者
                 .issuer(JWT_ISS)
                 // 签名
-                .signWith(KEY, ALGORITHM)
+                .signWith(KEY)
                 .compact();
     }
 
     /**
      * 解析token,
      * 使用不一致签名的私钥解析token会抛出异常
+     * token过期时会抛出异常
+     * 注意捕获处理
      *
      * @param token token
      * @return Jws<Claims>
@@ -141,7 +139,7 @@ public class TokenUtil {
                 .add(headers)
                 .and()
                 .claims(claims)
-                .signWith(KEY, ALGORITHM)
+                .signWith(KEY)
                 .compact();
     }
 }
