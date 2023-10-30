@@ -60,7 +60,7 @@ public class TokenUtil {
         return Token.builder()
                 .accessToken(genAccessToken(username, role))
                 .refreshToken(refreshToken)
-                .expire(new Timestamp(Instant.now().plusSeconds(ACCESS_EXPIRE).toEpochMilli()))
+                .expire(Instant.now().plusSeconds(ACCESS_EXPIRE).toEpochMilli())
                 .build();
     }
 

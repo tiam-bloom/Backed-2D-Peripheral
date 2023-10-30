@@ -19,5 +19,5 @@ import java.sql.Timestamp;
 public class Token {
     private String accessToken;
     private String refreshToken;
-    private Timestamp expire;
+    private Long expire;
 }
