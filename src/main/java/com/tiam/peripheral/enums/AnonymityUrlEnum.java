@@ -3,6 +3,10 @@ package com.tiam.peripheral.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * @author Tiam
  * @date 2023/10/23 16:28
@@ -29,5 +33,14 @@ public enum AnonymityUrlEnum {
             }
         }
         return false;
+    }
+
+    /**
+     * 获取匿名访问路径
+     *
+     * @return 匿名访问路径列表
+     */
+    public static List<String> anonymityUrlList() {
+        return Arrays.stream(AnonymityUrlEnum.values()).map(AnonymityUrlEnum::getUrl).collect(Collectors.toList());
     }
 }

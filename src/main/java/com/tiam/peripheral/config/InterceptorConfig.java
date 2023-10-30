@@ -7,10 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * @author Tiam
  * @date 2023/10/23 17:26
@@ -25,14 +21,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")//拦截所有的路径
-                .excludePathPatterns(anonymityUrlList()); // 不拦截匿名访问路径
-    }
-
-    /**
-     * 获取匿名访问路径
-     * @return 匿名访问路径列表
-     */
-    private List<String> anonymityUrlList() {
-        return Arrays.stream(AnonymityUrlEnum.values()).map(AnonymityUrlEnum::getUrl).collect(Collectors.toList());
+                .excludePathPatterns(AnonymityUrlEnum.anonymityUrlList()); // 不拦截匿名访问路径
     }
 }
