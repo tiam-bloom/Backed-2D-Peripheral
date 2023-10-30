@@ -7,12 +7,16 @@ import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecureDigestAlgorithm;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * @author Tiam
@@ -34,7 +38,7 @@ public class TokenUtil {
      * 一旦客户端得知这个secret, 那就意味着客户端是可以自我签发jwt了。
      * 应该大于等于 256位(长度32及以上的字符串)，并且是随机的字符串
      */
-    private final static String SECRET = "qwertyuidasdfghjklzxcvbnm12234567890";
+    private final static String SECRET = "qwertyuidasdfghjklzxcvbnm122345678901";
     /**
      * 秘钥实例
      */
@@ -100,6 +104,7 @@ public class TokenUtil {
 
     /**
      * 解析token
+     *
      * @param token token
      * @return Jws<Claims>
      */
@@ -118,4 +123,24 @@ public class TokenUtil {
         return parseClaim(token).getPayload();
     }
 
+    /**
+     * 验证token: 解析传入的token获得username与role,
+     * 根据username与role生成token, 与传入的token比较是否一致
+     * 使用不一样私钥生成的token是不一致的, 所以私钥SECRET不能泄露
+     * @param token token
+     * @return Predicate<String>
+     */
+    public static BiPredicate<String, String> verifyToken(String token) {
+        return (username, role) -> StringUtils.equals(genAccessToken(username, role), token);
+    }
+
+    public static String genAccessToken(Map<String, Object> headers, Map<String, ?> claims){
+        return Jwts.builder()
+                .header()
+                .add(headers)
+                .and()
+                .claims(claims)
+                .signWith(KEY, ALGORITHM)
+                .compact();
+    }
 }
