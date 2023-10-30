@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Tiam
@@ -35,9 +36,8 @@ public class UserController {
     private RoleService roleService;
 
     @PostMapping("/login")
-    public R<?> login(@RequestBody @Validated User user, HttpSession session) {
+    public R<?> login(@RequestBody @Validated User user) {
         log.info("login: {}", user);
-
         User one = userService.query().eq("username", user.getUsername()).one();
         if (one == null) {
             throw new BizException("用户不存在");
@@ -46,7 +46,6 @@ public class UserController {
             throw new BizException("密码错误");
         }
         LoginToken loginToken = userService.login(user);
-        session.setAttribute("username", user.getUsername());
         return R.ok("登录成功", loginToken);
     }
 
@@ -62,20 +61,15 @@ public class UserController {
     }
 
     @PostMapping("/refreshToken")
-    public R<Token> refreshToken(@RequestBody Map<String, String> map, HttpSession session) {
+    public R<Token> refreshToken(@RequestBody Map<String, String> map) {
         // { refreshToken: data.refreshToken }
         String refreshToken = map.get("refreshToken");
-        if (refreshToken == null) {
+        if (Objects.isNull(refreshToken)) {
             throw new BizException("refreshToken不能为空");
         }
-        // fixme: 从session中获取用户名
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            throw new BizException(ExceptionEnum.NOT_LOGIN);
-        }
-        String name = RedisUtil.get(refreshToken);
-        if (!StringUtils.equals(name, username)) {
-            throw new BizException("refreshToken错误");
+        String username = RedisUtil.get(refreshToken);
+        if(Objects.isNull(username)){
+            throw new BizException("refreshToken不合法");
         }
         Role role = roleService.lambdaQuery().eq(Role::getRoleName, username).one();
         Token token = TokenUtil.genToken(username, role.getRoleName());
@@ -83,8 +77,9 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public R<?> logout(HttpSession session) {
-        session.removeAttribute("username");
+    public R<?> logout() {
+        // todo 移除refreshToken
+        // RedisUtil.del(TokenUtil.KEY);
         return R.ok("登出成功");
     }
 
