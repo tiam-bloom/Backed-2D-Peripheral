@@ -1,13 +1,14 @@
 package com.tiam.peripheral.utils;
 
 import com.tiam.peripheral.vo.Token;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecureDigestAlgorithm;
+import io.jsonwebtoken.security.SignatureAlgorithm;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
+import java.security.Key;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Date;
@@ -28,6 +29,10 @@ public class TokenUtil {
      */
     public static final int ACCESS_EXPIRE = 60 * 60 * 7;
     public static final int REFRESH_EXPIRE = 60 * 60 * 24 * 7;
+    /**
+     * 指定签名算法
+     */
+    public static final SecureDigestAlgorithm<SecretKey, SecretKey> ALGORITHM = Jwts.SIG.HS256;
 
     /**
      * 私钥 / 生成签名的时候使用的秘钥secret，一般可以从本地配置文件中读取，切记这个秘钥不能外露，只在服务端使用，在任何场景都不应该流露出去。
@@ -36,9 +41,9 @@ public class TokenUtil {
      */
     private final static String SECRET = "qwertyuidasdfghjklzxcvbnm122345678901";
     /**
-     * 秘钥实例
+     * 秘钥实例, 或者 Jwts.SIG.HS256.key().build() 随机密钥
      */
-    public static final SecretKey KEY = Jwts.SIG.HS256.key().build();
+    public static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
     /**
      * jwt签发者
      */
@@ -94,7 +99,7 @@ public class TokenUtil {
                 // 签发者
                 .issuer(JWT_ISS)
                 // 签名
-                .signWith(KEY)
+                .signWith(SECRET_KEY, ALGORITHM)
                 .compact();
     }
 
@@ -109,7 +114,7 @@ public class TokenUtil {
      */
     public static Jws<Claims> parseClaim(String token) {
         return Jwts.parser()
-                .verifyWith(KEY)
+                .verifyWith(SECRET_KEY)
                 .build()
                 .parseSignedClaims(token);
     }
@@ -126,6 +131,7 @@ public class TokenUtil {
      * 验证token: 解析传入的token获得username与role,
      * 根据username与role生成token, 与传入的token比较是否一致
      * 使用不一样私钥生成的token是不一致的, 所以私钥SECRET不能泄露
+     *
      * @param token token
      * @return Predicate<String>
      */
@@ -133,13 +139,13 @@ public class TokenUtil {
         return (username, role) -> StringUtils.equals(genAccessToken(username, role), token);
     }
 
-    public static String genAccessToken(Map<String, Object> headers, Map<String, ?> claims){
+    public static String genAccessToken(Map<String, Object> headers, Map<String, ?> claims) {
         return Jwts.builder()
                 .header()
                 .add(headers)
                 .and()
                 .claims(claims)
-                .signWith(KEY)
+                .signWith(SECRET_KEY, ALGORITHM)
                 .compact();
     }
 }

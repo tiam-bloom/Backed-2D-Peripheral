@@ -5,9 +5,14 @@ import com.tiam.peripheral.utils.TokenUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwsHeader;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -91,5 +96,23 @@ public class TokenTest {
         Claims payload = claimsJws.getPayload();
         System.out.println(payload);
 
+    }
+
+    @Test
+    public void test5() {
+        // 随机生成的密钥
+        SecretKey key = Jwts.SIG.HS256.key().build();
+        String format = key.getFormat();
+        System.out.println(new String(key.getEncoded()));
+        // 自定义密钥
+        SecretKey secretKey = Keys.hmacShaKeyFor("1231234567890awertyusdfghjertyudfghasd".getBytes());
+        System.out.println(new String(secretKey.getEncoded(), StandardCharsets.UTF_8));
+
+
+        String jws = Jwts.builder().subject("Joe").signWith(key).compact();
+        System.out.println(jws);
+
+        Jws<Claims> claimsJws = Jwts.parser().verifyWith(key).build().parseSignedClaims(jws);
+        System.out.println(claimsJws);
     }
 }
