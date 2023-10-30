@@ -35,7 +35,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 获取用户角色
         Role role = roleMapper.selectOne(new QueryWrapper<Role>().lambda().eq(Role::getId, user.getRoleId()));
 
-        Token token = TokenUtil.genToken(username);
+        Token token = TokenUtil.genToken(username, role.getRoleName());
 
         return new LoginToken(token)
                 .setUsername(username)

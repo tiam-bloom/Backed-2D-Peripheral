@@ -89,7 +89,7 @@ public class UserController {
     }
 
     @GetMapping("/user/list")
-    public R<?> list() {
+    public R<List<User>> list() {
         List<User> list = userService.list();
         return R.ok(list);
     }

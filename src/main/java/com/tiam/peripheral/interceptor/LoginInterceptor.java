@@ -1,6 +1,7 @@
 package com.tiam.peripheral.interceptor;
 
-import com.tiam.peripheral.utils.RedisUtil;
+import com.tiam.peripheral.utils.TokenUtil;
+import io.jsonwebtoken.Claims;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -32,13 +33,20 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 记录日志
         log.debug("请求路径：{}", request.getRequestURI());
-        // 校验是否登录
+        // todo 完善校验规则 校验是否登录/有权限
         HttpSession session = request.getSession();
         String username = (String) session.getAttribute("username");
-
-        // 校验accessToken
+        // 校验accessToken, fixme: Authorization任意值都会通过 权限校验结果, null <==> null
         String accessToken = request.getHeader("Authorization");
-        String name = RedisUtil.get(Objects.requireNonNull(accessToken));
+        if (Objects.isNull(username) && Objects.isNull(accessToken)) {
+            // 重定向到未登录接口
+            response.sendRedirect("/unLogin");
+            return false;
+        }
+        // 解析accessToken
+        Claims claims = TokenUtil.parsePayload(accessToken);
+        String name = claims.get("username", String.class);
+        log.debug("权限校验结果, {} <==> {}", name, username);
         if (StringUtils.equals(name, username)) {
             return true;
         }
