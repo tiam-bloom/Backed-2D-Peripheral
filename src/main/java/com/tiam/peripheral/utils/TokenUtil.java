@@ -1,6 +1,9 @@
 package com.tiam.peripheral.utils;
 
 import com.tiam.peripheral.vo.Token;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecureDigestAlgorithm;
@@ -93,6 +96,26 @@ public class TokenUtil {
                 // 签名
                 .signWith(KEY, ALGORITHM)
                 .compact();
+    }
+
+    /**
+     * 解析token
+     * @param token token
+     * @return Jws<Claims>
+     */
+    public static Jws<Claims> parseClaim(String token) {
+        return Jwts.parser()
+                .verifyWith(KEY)
+                .build()
+                .parseSignedClaims(token);
+    }
+
+    public static JwsHeader parseHeader(String token) {
+        return parseClaim(token).getHeader();
+    }
+
+    public static Claims parsePayload(String token) {
+        return parseClaim(token).getPayload();
     }
 
 }
