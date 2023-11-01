@@ -4,6 +4,7 @@ import com.tiam.peripheral.exception.BizException;
 import com.tiam.peripheral.vo.R;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -36,8 +37,11 @@ public class BizExceptionHandler {
     public R<?> jwtExceptionHandler(JwtException e) {
         log.debug("token异常捕获,错误原因>>>" + e.getMessage());
         // 判断具体异常
-        if(e.getClass().equals(ExpiredJwtException.class)){
+        if(e instanceof ExpiredJwtException){
             return R.error("token过期, 请重新登录!");
+        }
+        if(e instanceof SignatureException){
+            return R.error("非法token, 请重新登录!");
         }
         return R.error("token异常, 请重新登录!");
     }
