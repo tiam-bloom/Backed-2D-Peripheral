@@ -49,6 +49,10 @@ public class LoginInterceptor implements HandlerInterceptor {
         log.debug("请求路径：{}", request.getRequestURI());
         // 校验accessToken, 合法accessToken == 已登录
         String accessToken = request.getHeader("Authorization");
+        // 截取Bearer, token标准格式 => 请求头中 Authorization: Bearer token
+        if (StringUtils.isNotBlank(accessToken)) {
+            accessToken = accessToken.substring(7);
+        }
         if (Objects.isNull(accessToken)) {
             throw new BizException(ExceptionEnum.NOT_LOGIN);
         }

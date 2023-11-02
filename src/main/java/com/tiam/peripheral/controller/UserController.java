@@ -76,6 +76,7 @@ public class UserController {
         if(Objects.isNull(username)){
             throw new BizException("refreshToken不合法");
         }
+        // fixme
         Role role = roleService.lambdaQuery().eq(Role::getRoleName, username).one();
         Token token = TokenUtil.genToken(username, role.getRoleName());
         return R.ok("刷新成功", token);
@@ -91,7 +92,7 @@ public class UserController {
     @GetMapping("/user/list")
     public R<List<User>> list() {
         List<User> list = userService.list();
-        return R.ok(list);
+        return R.ok("查询成功", list);
     }
 
 

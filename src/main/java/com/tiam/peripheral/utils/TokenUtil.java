@@ -56,6 +56,7 @@ public class TokenUtil {
 
     public static Token genToken(String username, String role) {
         String refreshToken = UUID.randomUUID().toString();
+        // 保存角色+用户名
         RedisUtil.set(refreshToken, username, REFRESH_EXPIRE);
         return Token.builder()
                 .accessToken(genAccessToken(username, role))
