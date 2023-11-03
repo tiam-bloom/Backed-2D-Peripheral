@@ -2,7 +2,7 @@
 
 - DDL 转 JavaBean: https://java.bejson.com/generator/
 
-## chore
+## 提交规范
 
 | 规范名      | 描述                                          |
 |----------|---------------------------------------------|
@@ -16,3 +16,16 @@
 | revert   | 回滚到上一个版本                                    |
 | style    | 仅仅修改了空格、格式缩进、都好等等，不改变代码逻辑                   |
 | test     | 测试用例，包括单元测试、集成测试等                           |
+
+## something
+- Redis
+- SpringBoot2.7.6
+- MybatisPlus
+- Jwt
+
+基本的登录注册, 
+权限访问, 
+以及用户角色表的CRUD, 
+全局统一异常处理
+Jwt权限校验
+
