@@ -1,15 +1,15 @@
 package com.tiam.peripheral.utils;
 
 import com.tiam.peripheral.vo.Token;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwsHeader;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecureDigestAlgorithm;
-import io.jsonwebtoken.security.SignatureAlgorithm;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
@@ -54,10 +54,7 @@ public class TokenUtil {
     private final static String SUBJECT = "Peripherals";
 
 
-    public static Token genToken(String username, String role) {
-        String refreshToken = UUID.randomUUID().toString();
-        // 保存角色+用户名
-        RedisUtil.set(refreshToken, username, REFRESH_EXPIRE);
+    public static Token genToken(String username, String role, String refreshToken) {
         return Token.builder()
                 .accessToken(genAccessToken(username, role))
                 .refreshToken(refreshToken)
@@ -65,16 +62,8 @@ public class TokenUtil {
                 .build();
     }
 
-    /*
-    这些是一组预定义的声明，它们 不是强制性的，而是推荐的 ，以 提供一组有用的、可互操作的声明 。
-    iss: jwt签发者
-    sub: jwt所面向的用户
-    aud: 接收jwt的一方
-    exp: jwt的过期时间，这个过期时间必须要大于签发时间
-    nbf: 定义在什么时间之前，该jwt都是不可用的.
-    iat: jwt的签发时间
-    jti: jwt的唯一身份标识，主要用来作为一次性token,从而回避重放攻击
-     */
+
+
     public static String genAccessToken(String username, String role) {
         // 令牌id
         String uuid = UUID.randomUUID().toString();

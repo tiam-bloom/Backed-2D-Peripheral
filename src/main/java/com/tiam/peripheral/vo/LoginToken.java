@@ -19,4 +19,9 @@ public class LoginToken extends Token {
     public LoginToken(Token token){
         super(token.getAccessToken(), token.getRefreshToken(), token.getExpire());
     }
+
+    public LoginToken(String username, String role) {
+        this.username = username;
+        this.role = role;
+    }
 }
