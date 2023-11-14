@@ -125,6 +125,7 @@ public class TokenUtil {
      * @param token token
      * @return Predicate<String>
      */
+    @Deprecated
     public static BiPredicate<String, String> verifyToken(String token) {
         return (username, role) -> StringUtils.equals(genAccessToken(username, role), token);
     }
